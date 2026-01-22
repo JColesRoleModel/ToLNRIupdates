@@ -486,6 +486,11 @@
 
       // Initial update
       updateHomeStats();
+
+      // Listen for remote data sync
+      window.addEventListener('time-tracker-update', () => {
+        updateHomeStats();
+      });
     });
   </script>
   <script src="js/time-tracker.js"></script>

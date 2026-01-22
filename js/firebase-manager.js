@@ -129,56 +129,79 @@ class FirebaseManager {
     // Real sync is complex. For now, we'll just ensure the user doc exists and maybe pull stats?
     // Actually, the requirement says "data storage across sessions and devices".
     // This implies we should DOWNLOAD data too.
+    // Sync Data: Two-way synchronization
+    // 1. Upload local sessions that are not in cloud.
+    // 2. Download cloud sessions that are not in local.
     async syncData() {
-        if (!this.user) return;
+        if (!this.user || !window.timeTracker) return;
 
         try {
             const userRef = doc(db, "users", this.user.uid);
             const docSnap = await getDoc(userRef);
 
+            let remoteSessions = [];
+
             if (docSnap.exists()) {
-                const remoteData = docSnap.data();
-                const remoteSessions = remoteData.sessions || [];
-
-                // We need to merge with local window.timeTracker
-                if (window.timeTracker) {
-                    const localSessions = window.timeTracker.data.sessions;
-
-                    // Simple merge strategy: ID based?
-                    // We don't have IDs on sessions yet. We rely on timestamp.
-                    const distinctSessions = [...localSessions];
-
-                    let newFromRemote = 0;
-                    remoteSessions.forEach(rSession => {
-                        const exists = localSessions.some(lSession =>
-                            lSession.timestamp === rSession.timestamp &&
-                            lSession.movement === rSession.movement
-                        );
-                        if (!exists) {
-                            distinctSessions.push(rSession);
-                            newFromRemote++;
-                        }
-                    });
-
-                    if (newFromRemote > 0) {
-                        console.log(`Synced ${newFromRemote} sessions from cloud.`);
-                        window.timeTracker.data.sessions = distinctSessions;
-                        window.timeTracker.saveData();
-
-                        // Update UI if stats UI is open or home stats
-                        // Trigger a page reload or custom event? 
-                        // Simplest is to just re-run updateHomeStats if it exists
-                        // But it's inside a closure in index.html.
-                        // We can reload the page if it's a fresh login with new data?
-                        // Or just let the user see it next time.
-                    }
-
-                    // Also upload any local sessions that aren't in remote (if we wanted full 2-way sync)
-                    // For now, simpler is better. Use 'saveSession' individually when they finish.
-                    // But for initial data, maybe we should bulk upload?
-                    // Let's implement a bulk merge upstream later if needed.
-                }
+                remoteSessions = docSnap.data().sessions || [];
+            } else {
+                // If user doesn't exist yet, we'll create them with local data soon
+                console.log("New user detected, creating existing remote doc...");
             }
+
+            const localSessions = window.timeTracker.data.sessions;
+
+            // --- 1. Push Local -> Remote ---
+            // Find sessions in local that are NOT in remote
+            const sessionsToUpload = localSessions.filter(lSession => {
+                return !remoteSessions.some(rSession =>
+                    rSession.timestamp === lSession.timestamp &&
+                    rSession.movement === lSession.movement
+                );
+            });
+
+            if (sessionsToUpload.length > 0) {
+                console.log(`Uploading ${sessionsToUpload.length} local sessions to cloud...`);
+
+                if (!docSnap.exists()) {
+                    await setDoc(userRef, {
+                        email: this.user.email,
+                        sessions: sessionsToUpload,
+                        lastSynced: new Date().toISOString()
+                    });
+                } else {
+                    await updateDoc(userRef, {
+                        sessions: arrayUnion(...sessionsToUpload),
+                        lastSynced: new Date().toISOString()
+                    });
+                }
+                // Add these to our local "remoteSessions" copy so we don't re-add them below
+                remoteSessions.push(...sessionsToUpload);
+            }
+
+            // --- 2. Pull Remote -> Local ---
+            // Find sessions in remote that are NOT in local
+            const sessionsToDownload = remoteSessions.filter(rSession => {
+                return !localSessions.some(lSession =>
+                    lSession.timestamp === rSession.timestamp &&
+                    lSession.movement === rSession.movement
+                );
+            });
+
+            if (sessionsToDownload.length > 0) {
+                console.log(`Downloading ${sessionsToDownload.length} sessions from cloud...`);
+                window.timeTracker.data.sessions.push(...sessionsToDownload);
+
+                // Sort by timestamp to keep things tidy
+                window.timeTracker.data.sessions.sort((a, b) => a.timestamp - b.timestamp);
+
+                window.timeTracker.saveData();
+
+                // NOTIFY UI
+                window.dispatchEvent(new CustomEvent('time-tracker-update'));
+            } else {
+                console.log('Local is already up to date.');
+            }
+
         } catch (e) {
             console.error('Sync failed', e);
         }
