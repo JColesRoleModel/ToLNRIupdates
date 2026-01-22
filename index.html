@@ -1,19 +1,70 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Innervation Atlas - Tree of Life NRI</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+  <meta charset="utf-8">
+  <title>Tree of Life · Innervation Atlas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="css/legs_style.css">
   <link rel="stylesheet" href="css/footer-nav.css">
-  <!-- Favicon for site icon -->
+  <link rel="stylesheet" href="css/completion-modal.css">
+
+  <!-- Breathwork-specific CSS -->
+  <link rel="stylesheet" href="css/breathwork.css">
+  <!-- Eyes-specific CSS -->
+  <style>
+    /* Ocular background only for eyes view */
+    #view-eyes .app-main {
+      background-image:
+        linear-gradient(rgba(29, 26, 58, 0.3), rgba(29, 26, 58, 0.3)),
+        url('assets/neuroocular/eyesbackground.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    /* ... (Ocular Styles from eyes.html can be moved here or to legs_style.css) ... */
+    /* Moving them to legs_style.css is cleaner, but inline for now to save time: */
+    #view-eyes .info-section {
+      display: none;
+    }
+
+    #view-eyes .ocular-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 0.68rem;
+      color: rgba(245, 230, 205, 0.92);
+    }
+
+    #view-eyes .ocular-table thead th {
+      padding: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-size: 0.65rem;
+      background: rgba(76, 154, 197, 0.18);
+    }
+
+    #view-eyes .ocular-table tbody td {
+      padding: 6px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    #view-eyes .ocular-table .pos {
+      font-weight: 600;
+      color: var(--gold);
+      white-space: nowrap;
+    }
+
+    /* Ensure Views take full height */
+    .spa-view {
+      min-height: 80vh;
+    }
+  </style>
+
   <link rel="icon" type="image/png" href="assets/logo/tolnrilogo.png">
-  <!-- iPhone / iPad home screen icon -->
   <link rel="apple-touch-icon" sizes="180x180" href="assets/pwa/apple-touch-icon.png">
 
   <!-- PWA Configuration -->
@@ -21,17 +72,6 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Innervation">
-
-  <!-- Service Worker Registration -->
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js', { scope: '/ToLNRIupdates/' }) // GitHub Pages scope
-          .then(reg => console.log('Service Worker registered!', reg))
-          .catch(err => console.log('Service Worker registration failed: ', err));
-      });
-    }
-  </script>
 </head>
 
 <body>
@@ -45,7 +85,7 @@
         </div>
 
         <!-- CENTER: Logo -->
-        <a href="index.html" class="brand-logo-link">
+        <a href="#home" class="brand-logo-link">
           <img src="assets/logo/tolnrilogo.png" alt="Tree of Life logo" class="brand-logo-image">
         </a>
 
@@ -61,441 +101,976 @@
       </div>
     </header>
 
-    <main class="app-main">
-      <section class="screen screen-active">
-        <div class="home-top-row">
-          <h1 class="screen-title">Innervation Atlas</h1>
-          <div class="header-actions home-menu">
-            <div class="menu-dropdown">
-              <button class="menu-button" type="button" aria-label="Menu">☰</button>
-              <div class="menu-panel">
-                <a href="index.html">🏠 Home</a>
-                <a href="random.html">🔀 Random</a>
-                <a href="eyes.html">👁️ Eyes</a>
-                <a href="breathwork.html">🫁 Breathwork</a>
-                <a href="lower.html">🦶 Lower Body</a>
-                <a href="upper.html">💪 Upper Body</a>
-                <a href="head.html">🧠 Head</a>
-                <a href="mudras.html">🤲 Mudras</a>
-                <button type="button" data-menu-stats>📊 Stats</button>
-                <a href="mailto:TreeOfLifeNRI@yahoo.com">📱 Contact</a>
+    <div class="app-main-container">
+
+      <!-- VIEW: HOME (Original index.html content) -->
+      <div id="view-home" class="spa-view active">
+        <main class="app-main">
+          <section class="screen screen-active">
+            <h1 class="screen-title">Innervation Atlas</h1>
+            <p class="screen-tagline">
+              Targeted sensory & motor protocols for nervous system regulation.
+            </p>
+
+            <!-- Premium Stats Block -->
+            <!-- This will be populated by JS, but we provide structure -->
+            <div class="home-stats-block" id="home-dashboard-stats">
+              <div class="stats-widget">
+                <span class="stats-widget-val" id="dash-weekly-time">0h 0m</span>
+                <span class="stats-widget-label">This Week</span>
+              </div>
+              <div class="stats-widget">
+                <span class="stats-widget-val" id="dash-streak">0</span>
+                <span class="stats-widget-label">Day Streak</span>
               </div>
             </div>
-          </div>
-        </div>
 
-        <!-- Stats Summary Widget -->
-        <div class="home-stats-summary">
-          <div class="home-stat-item" id="home-week-time">
-            <div class="home-stat-value">—</div>
-            <div class="home-stat-label">This Week</div>
-          </div>
-          <div class="home-stat-item" id="home-day-streak">
-            <div class="home-stat-value">—</div>
-            <div class="home-stat-label">Day Streak</div>
-          </div>
-          <div class="home-action-buttons">
-            <button class="home-action-btn home-random-btn" id="home-random-btn" title="Start random routine">
-              <span class="home-action-icon">🔀</span>
-              <span class="home-action-text">Random</span>
-            </button>
-            <button class="home-action-btn home-stats-btn" id="home-stats-btn" title="View detailed statistics">
-              <span class="home-action-icon">📊</span>
-              <span class="home-action-text">Stats</span>
-            </button>
-          </div>
-        </div>
-
-        <div class="routine-list">
-          <!-- Neuro-Ocular card -->
-          <div class="routine-card" data-href="eyes.html">
-            <div class="routine-header-row">
-              <div class="routine-name">Neuro-Ocular Activation</div>
-            </div>
-            <div class="icon-strip ocular-icons">
-              <a href="eyes.html?routine=FULL" class="icon-thumb" title="All 9 points">
-                <img data-src="assets/neuroocular/icons/all9.svg" alt="All 9 Icon">
+            <!-- Quick Actions -->
+            <div class="action-row">
+              <a href="#random" class="action-btn">
+                <span>🔀 Random</span>
               </a>
-              <a href="eyes.html?routine=CORE" class="icon-thumb" title="Main 4 points">
-                <img data-src="assets/neuroocular/icons/9main4.svg" alt="Main 4 Icon">
+              <button id="dash-stats-btn" class="action-btn">
+                <span>📊 Stats</span>
+              </button>
+            </div>
+
+            <!-- Dashboard Grid (The "Magical Boxes") -->
+            <div class="dashboard-grid">
+
+              <!-- 1. EYES -->
+              <a href="#eyes" class="dashboard-card">
+                <div class="card-header">
+                  <div class="card-title">Neuro-Ocular Activation</div>
+                </div>
+                <!-- Using pure CSS/Text for the Golden Arrows to match the "original" look if files are missing.
+                     The screenshot shows: 8-way (TopLeft), Horizontal (TopRight), Diverging/Zoom (BottomLeft), Single (BottomRight)
+                     We will use large text/emoji or simple inline SVGs if possible.
+                     Given I cannot find the specific SVGs, I will likely use these text representations or Unicode, styled gold.
+                -->
+                <div class="card-visuals">
+                  <div class="dash-thumb"><img src="assets/neuroocular/icons/9allicon.svg" alt="All directions"></div>
+                  <div class="dash-thumb"><img src="assets/neuroocular/icons/9main4.svg" alt="Main directions"></div>
+                  <div class="dash-thumb"><img src="assets/neuroocular/icons/9crossicon.svg" alt="Cross directions">
+                  </div>
+                  <div class="dash-thumb"><img src="assets/neuroocular/icons/9dicon.svg" alt="Depth"></div>
+                </div>
               </a>
-              <a href="eyes.html?routine=DIAGONAL" class="icon-thumb" title="Supplemental 4 points">
-                <img data-src="assets/neuroocular/icons/9supp4.svg" alt="Supplemental 4 Icon">
+
+              <!-- 2. BREATHWORK -->
+              <a href="#breathwork" class="dashboard-card">
+                <div class="card-header">
+                  <div class="card-title">Breathwork Toolkit</div>
+                </div>
+                <div class="card-visuals">
+                  <div class="dash-thumb"><img src="assets/breath/solar.png" alt=""></div>
+                  <div class="dash-thumb"><img src="assets/breath/lunar.png" alt=""></div>
+                  <div class="dash-thumb"><img src="assets/breath/alternate.png" alt=""></div>
+                  <div class="dash-thumb"><img src="assets/breath/cyclical.png" alt=""></div>
+                </div>
               </a>
-              <a href="eyes.html?routine=ALERT" class="icon-thumb" title="Heart Chakra">
-                <img data-src="assets/neuroocular/icons/9heicon.svg" alt="Heart Chakra Icon">
+
+              <!-- 3. LOWER BODY -->
+              <a href="#lower" class="dashboard-card">
+                <div class="card-header">
+                  <div class="card-title">Lower Body Innervation</div>
+                </div>
+                <div class="card-visuals">
+                  <div class="dash-thumb"><img src="InnervationSVGs/1_FEET_MIDCROSSRIGHT_D_IMG.svg" alt=""></div>
+                  <div class="dash-thumb"><img src="InnervationSVGs/1_HIPS1_LEFTFRONTIN_D_IMG.svg" alt=""></div>
+                  <div class="dash-thumb"><img src="InnervationSVGs/1_GROUNDING_FORWARD_D_IMG.svg" alt=""></div>
+                  <div class="dash-thumb"><img src="InnervationSVGs/1_HIPS2_STAGGEROPPOSITELEFTFRONT_D_IMG.svg" alt="">
+                  </div>
+                </div>
               </a>
-            </div>
-          </div>
 
-          <!-- Breathwork Toolkit -->
-          <div class="routine-card" data-href="breathwork.html">
-            <div class="routine-header-row">
-              <div class="routine-name">Breathwork Toolkit</div>
-            </div>
-            <div class="thumb-strip">
-              <div class="thumb"><img data-src="assets/breath/solar.png" alt="Solar pattern"></div>
-              <div class="thumb"><img data-src="assets/breath/lunar.png" alt="Lunar pattern"></div>
-              <div class="thumb"><img data-src="assets/breath/alternate.png" alt="Alternate pattern"></div>
-              <div class="thumb"><img data-src="assets/breath/cyclical.png" alt="Cyclical pattern"></div>
-            </div>
-          </div>
-
-          <!-- Lower Body Innervation -->
-          <div class="routine-card" data-href="lower.html">
-            <div class="routine-header-row">
-              <div class="routine-name">Lower Body Innervation</div>
-            </div>
-            <div class="icon-strip lower-icons">
-              <!-- JS will inject four icons using first movement image from each routine -->
-            </div>
-          </div>
-
-          <!-- Upper Body Innervation -->
-          <div class="routine-card" data-href="upper.html">
-            <div class="routine-header-row">
-              <div class="routine-name">Upper Body Innervation</div>
-            </div>
-            <div class="icon-strip upper-icons">
-              <!-- JS will inject up to 6 random routine icons -->
-            </div>
-          </div>
-
-          <!-- Head Innervation -->
-          <div class="routine-card" data-href="head.html">
-            <div class="routine-header-row">
-              <div class="routine-name">Head Innervation</div>
-            </div>
-            <div class="icon-strip head-icons">
-              <!-- JS will inject up to 6 random routine icons -->
-            </div>
-          </div>
-
-          <!-- Mudras -->
-          <div class="routine-card" data-href="mudras.html">
-            <div class="routine-header-row">
-              <div class="routine-name">Mudras</div>
-            </div>
-            <div class="thumb-strip mudras-strip">
-              <!-- JS will inject 3 random mudra thumbnails -->
-            </div>
-          </div>
-
-          <!-- Other: About / FAQ / Contact -->
-          <div class="routine-card about-card" data-href="other.html">
-            <div class="routine-header-row">
-              <div class="routine-name">About / FAQ / Contact</div>
-            </div>
-          </div>
-
-          <!-- Presenter info + Back to top -->
-          <div class="footer-cta-bar">
-            <div class="social-icons">
-              <a href="https://www.pinterest.com" target="_blank" rel="noopener" title="Pinterest">
-                <img src="assets/social/pinterest.png" alt="Pinterest" width="28" height="28">
+              <!-- 4. UPPER BODY -->
+              <a href="#upper" class="dashboard-card">
+                <div class="card-header">
+                  <div class="card-title">Upper Body Innervation</div>
+                </div>
+                <div class="card-visuals">
+                  <div class="dash-thumb"><img src="InnervationSVGs/2_CLASPMID_LEFT_D_IMG.svg" alt=""></div>
+                  <div class="dash-thumb"><img src="InnervationSVGs/2_PALMOPEN_UP_D_IMG.svg" alt=""></div>
+                  <div class="dash-thumb"><img src="InnervationSVGs/2_HEARTOPEN_BOTH_D_IMG.svg" alt=""></div>
+                  <div class="dash-thumb"><img src="InnervationSVGs/2_CROSSPALM_down_0_IMG.svg" alt=""></div>
+                </div>
               </a>
-              <a href="https://www.youtube.com" target="_blank" rel="noopener" title="YouTube">
-                <img src="assets/social/youtube.png" alt="YouTube" width="28" height="28">
-              </a>
-              <a href="https://www.instagram.com" target="_blank" rel="noopener" title="Instagram">
-                <img src="assets/social/instagram.png" alt="Instagram" width="28" height="28">
-              </a>
-              <a href="https://www.tiktok.com" target="_blank" rel="noopener" title="TikTok">
-                <img src="assets/social/tiktok.png" alt="TikTok" width="28" height="28">
-              </a>
-            </div>
-          </div>
 
-        </div>
+              <!-- 5. CRANIAL (HEAD) -->
+              <a href="#head" class="dashboard-card">
+                <div class="card-header">
+                  <div class="card-title">Head Innervation</div>
+                </div>
+                <div class="card-visuals">
+                  <div class="dash-thumb"><img src="InnervationSVGs/3_CHINBOTTOM_0_D_IMG.svg" alt=""></div>
+                  <div class="dash-thumb"><img src="InnervationSVGs/3_LION_0_D_IMG.svg" alt=""></div>
+                  <div class="dash-thumb"><img src="InnervationSVGs/3_OPENNOSE_CLOSEMOUTH_D_IMG.svg" alt=""></div>
+                  <div class="dash-thumb"><img src="InnervationSVGs/3_PULLTOP_R_D_IMG.svg" alt=""></div>
+                </div>
+              </a>
+
+              <!-- 6. MUDRAS -->
+              <a href="#mudras" class="dashboard-card">
+                <div class="card-header">
+                  <div class="card-title">Mudras</div>
+                </div>
+                <div class="card-visuals">
+                  <!-- Using first 4 mudras -->
+                  <div class="dash-thumb"><img src="assets/mudras/1.svg" alt=""></div>
+                  <div class="dash-thumb"><img src="assets/mudras/2.svg" alt=""></div>
+                  <div class="dash-thumb"><img src="assets/mudras/3.svg" alt=""></div>
+                  <div class="dash-thumb"><img src="assets/mudras/4.svg" alt=""></div>
+                </div>
+              </a>
+
+            </div>
+      </div>
+
+      <div id="stats-btn-container"></div>
       </section>
-    </main>
+      </main>
+    </div>
 
-    <footer class="app-footer">
-      <nav class="footer-nav">
-        <a href="random.html">🔀 Random</a>
-        <a href="#" id="footer-stats">📊 Stats</a>
-        <a href="index.html">☰ Home</a>
-      </nav>
-    </footer>
+    <!-- VIEW: LOWER BODY -->
+    <div id="view-lower" class="spa-view">
+      <main class="app-main">
+        <section id="lower-screen-select" class="screen screen-active">
+          <h1 class="screen-title">Lower Body Innervation</h1>
+          <p class="screen-tagline">Choose a routine to awaken the feet, hips and grounding lines.</p>
+          <div id="lower-routine-list" class="routine-list"></div>
+          <button id="lower-btn-random" class="btn random-btn">
+            <span class="random-icon">⇄</span>
+            <span>Random Routine</span>
+          </button>
+        </section>
+
+        <section id="lower-screen-prefs" class="screen">
+          <button class="back-btn" data-back="lower-screen-select">← Back</button>
+          <h1 id="lower-prefs-title" class="screen-title">Routine</h1>
+          <p id="lower-prefs-tagline" class="screen-tagline">Set your timing and rounds.</p>
+          <div class="routine-preview-card">
+            <div class="preview-label" id="lower-prefs-preview-label"></div>
+            <div class="preview-strip" id="lower-prefs-preview-strip"></div>
+          </div>
+          <div class="prefs-grid">
+            <div class="field">
+              <label for="lower-input-seconds">Seconds per movement</label>
+              <input id="lower-input-seconds" type="number" min="5" max="300" step="5" value="45">
+            </div>
+            <div class="field">
+              <label for="lower-input-rest">Time between movements (sec)</label>
+              <input id="lower-input-rest" type="number" min="0" max="120" step="1" value="3">
+            </div>
+            <div class="field">
+              <label for="lower-input-rounds">Rounds of routine</label>
+              <input id="lower-input-rounds" type="number" min="1" max="12" step="1" value="2">
+            </div>
+            <div class="field">
+              <label>Audio</label>
+              <button id="lower-audio-toggle" class="pill-toggle" data-on="1">
+                <span class="pill-knob"></span>
+                <span class="pill-label">On</span>
+              </button>
+            </div>
+          </div>
+          <button id="lower-btn-start-routine" class="btn primary-btn full-width">Start Routine</button>
+        </section>
+
+        <section id="lower-screen-player" class="screen">
+          <button class="back-btn" data-back="lower-screen-prefs">← Back</button>
+          <h1 id="lower-player-title" class="screen-title">Routine</h1>
+          <p id="lower-player-tagline" class="screen-tagline">Follow the movements at your own pace.</p>
+          <div class="routine-preview-card">
+            <div class="preview-label" id="lower-player-preview-label"></div>
+            <div class="preview-strip" id="lower-player-preview-strip"></div>
+          </div>
+          <div class="current-movement-card">
+            <div id="lower-current-movement-label" class="movement-label">Movement</div>
+            <div class="movement-image-frame">
+              <img id="lower-current-movement-image" alt="Current movement">
+            </div>
+            <div class="movement-meta">
+              <div id="lower-movement-count" class="movement-count">Movement 1 of 1</div>
+              <div id="lower-round-count" class="round-count">Round 1 of 1</div>
+              <div id="lower-phase-label" class="phase-label">Ready</div>
+            </div>
+          </div>
+          <div class="progress-area">
+            <div class="progress-wrap">
+              <div id="lower-prog" class="progress-fill"></div>
+            </div>
+          </div>
+          <div class="player-controls">
+            <button id="lower-btn-play-pause" class="btn primary-btn">Start</button>
+            <button id="lower-btn-restart" class="btn ghost-btn">Restart Routine</button>
+          </div>
+          <div id="lower-status-message" class="status-message"></div>
+        </section>
+      </main>
+    </div>
+
+    <!-- VIEW: UPPER BODY -->
+    <div id="view-upper" class="spa-view">
+      <main class="app-main">
+        <section id="upper-screen-select" class="screen screen-active">
+          <h1 class="screen-title">Upper Body Innervation</h1>
+          <!-- Tagline omitted per instruction -->
+          <div id="upper-routine-list" class="routine-list"></div>
+          <button id="upper-btn-random" class="btn random-btn">
+            <span class="random-icon">⇄</span>
+            <span>Random Routine</span>
+          </button>
+        </section>
+
+        <section id="upper-screen-prefs" class="screen">
+          <button class="back-btn" data-back="upper-screen-select">← Back</button>
+          <h1 id="upper-prefs-title" class="screen-title">Routine</h1>
+          <p id="upper-prefs-tagline" class="screen-tagline">Set your timing and rounds.</p>
+          <div class="routine-preview-card">
+            <div class="preview-label" id="upper-prefs-preview-label"></div>
+            <div class="preview-strip" id="upper-prefs-preview-strip"></div>
+          </div>
+          <div class="prefs-grid">
+            <div class="field">
+              <label for="upper-input-seconds">Seconds per movement</label>
+              <input id="upper-input-seconds" type="number" min="5" max="300" step="5" value="45">
+            </div>
+            <div class="field">
+              <label for="upper-input-rest">Time between movements (sec)</label>
+              <input id="upper-input-rest" type="number" min="0" max="120" step="1" value="3">
+            </div>
+            <div class="field">
+              <label for="upper-input-rounds">Rounds of routine</label>
+              <input id="upper-input-rounds" type="number" min="1" max="12" step="1" value="2">
+            </div>
+            <div class="field">
+              <label>Audio</label>
+              <button id="upper-audio-toggle" class="pill-toggle" data-on="1">
+                <span class="pill-knob"></span>
+                <span class="pill-label">On</span>
+              </button>
+            </div>
+          </div>
+          <button id="upper-btn-start-routine" class="btn primary-btn full-width">Start Routine</button>
+        </section>
+
+        <section id="upper-screen-player" class="screen">
+          <button class="back-btn" data-back="upper-screen-prefs">← Back</button>
+          <h1 id="upper-player-title" class="screen-title">Routine</h1>
+          <p id="upper-player-tagline" class="screen-tagline">Follow the movements at your own pace.</p>
+          <div class="routine-preview-card">
+            <div class="preview-label" id="upper-player-preview-label"></div>
+            <div class="preview-strip" id="upper-player-preview-strip"></div>
+          </div>
+          <div class="current-movement-card">
+            <div id="upper-current-movement-label" class="movement-label">Movement</div>
+            <div class="movement-image-frame">
+              <img id="upper-current-movement-image" alt="Current movement">
+            </div>
+            <div class="movement-meta">
+              <div id="upper-movement-count" class="movement-count">Movement 1 of 1</div>
+              <div id="upper-round-count" class="round-count">Round 1 of 1</div>
+              <div id="upper-phase-label" class="phase-label">Ready</div>
+            </div>
+          </div>
+          <div class="progress-area">
+            <div class="progress-wrap">
+              <div id="upper-prog" class="progress-fill"></div>
+            </div>
+          </div>
+          <div class="player-controls">
+            <button id="upper-btn-play-pause" class="btn primary-btn">Start</button>
+            <button id="upper-btn-restart" class="btn ghost-btn">Restart Routine</button>
+          </div>
+          <div id="upper-status-message" class="status-message"></div>
+        </section>
+      </main>
+    </div>
+
+    <!-- VIEW: HEAD -->
+    <div id="view-head" class="spa-view">
+      <main class="app-main">
+        <section id="head-screen-select" class="screen screen-active">
+          <h1 class="screen-title">Head Innervation</h1>
+          <p class="screen-tagline">Choose a cranial sequence to wake up jaw, face, nose and scalp innervation.</p>
+          <div id="head-routine-list" class="routine-list"></div>
+          <button id="head-btn-random" class="btn random-btn">
+            <span class="random-icon">⇄</span>
+            <span>Random Head Sequence</span>
+          </button>
+        </section>
+
+        <section id="head-screen-prefs" class="screen">
+          <button class="back-btn" data-back="head-screen-select">← Back</button>
+          <h1 id="head-prefs-title" class="screen-title">Sequence</h1>
+          <p id="head-prefs-tagline" class="screen-tagline">Set your hold time, rest and rounds.</p>
+          <div class="routine-preview-card">
+            <div class="preview-label" id="head-prefs-preview-label"></div>
+            <div class="preview-strip" id="head-prefs-preview-strip"></div>
+          </div>
+          <div class="prefs-grid">
+            <div class="field">
+              <label for="head-input-seconds">Seconds per position</label>
+              <input id="head-input-seconds" type="number" min="5" max="120" step="5" value="45">
+            </div>
+            <div class="field">
+              <label for="head-input-rest">Time between positions (sec)</label>
+              <input id="head-input-rest" type="number" min="0" max="60" step="1" value="3">
+            </div>
+            <div class="field">
+              <label for="head-input-rounds">Rounds of sequence</label>
+              <input id="head-input-rounds" type="number" min="1" max="10" step="1" value="2">
+            </div>
+            <div class="field">
+              <label>Sound</label>
+              <button id="head-audio-toggle" class="pill-toggle" data-on="1">
+                <span class="pill-knob"></span>
+                <span class="pill-label">On</span>
+              </button>
+            </div>
+          </div>
+          <button id="head-btn-start-routine" class="btn primary-btn full-width">Start Sequence</button>
+        </section>
+
+        <section id="head-screen-player" class="screen">
+          <button class="back-btn" data-back="head-screen-prefs">← Back</button>
+          <h1 id="head-player-title" class="screen-title">Sequence</h1>
+          <p id="head-player-tagline" class="screen-tagline">Follow the head sequence and notice what changes in jaw,
+            face and neck.</p>
+          <div class="routine-preview-card">
+            <div class="preview-label" id="head-player-preview-label"></div>
+            <div class="preview-strip" id="head-player-preview-strip"></div>
+          </div>
+          <div class="current-movement-card">
+            <div id="head-current-movement-label" class="movement-label">Position</div>
+            <div class="movement-image-frame">
+              <img id="head-current-movement-image" alt="Current head movement">
+            </div>
+            <div class="movement-meta">
+              <div id="head-movement-count" class="movement-count">Movement 1 of 1</div>
+              <div id="head-round-count" class="round-count">Round 1 of 1</div>
+              <div id="head-phase-label" class="phase-label">Ready</div>
+            </div>
+          </div>
+          <div class="progress-area">
+            <div class="progress-wrap">
+              <div id="head-prog" class="progress-fill"></div>
+            </div>
+          </div>
+          <div class="player-controls">
+            <button id="head-btn-play-pause" class="btn primary-btn">Start</button>
+            <button id="head-btn-restart" class="btn ghost-btn">Restart Sequence</button>
+          </div>
+          <div id="head-status-message" class="status-message"></div>
+        </section>
+      </main>
+    </div>
+
+    <!-- VIEW: EYES -->
+    <div id="view-eyes" class="spa-view">
+      <main class="app-main">
+        <section id="eyes-screen-select" class="screen screen-active">
+          <h1 class="screen-title">Neuro-Ocular Activation</h1>
+          <p class="screen-tagline">Select a gaze sequence to engage the visual and vestibular systems.</p>
+          <div id="eyes-routine-list" class="routine-list"></div>
+          <button id="eyes-btn-random" class="btn random-btn">
+            <span class="random-icon">⇄</span>
+            <span>Random Gaze Sequence</span>
+          </button>
+          <div class="info-link-container" style="text-align:center; margin-top:20px;">
+            <!-- Info section toggles or links could go here if needed -->
+          </div>
+        </section>
+
+        <section id="eyes-screen-prefs" class="screen">
+          <button class="back-btn" data-back="eyes-screen-select">← Back</button>
+          <h1 id="eyes-prefs-title" class="screen-title">Sequence</h1>
+          <p id="eyes-prefs-tagline" class="screen-tagline">Set your gaze duration and rest.</p>
+          <div class="routine-preview-card">
+            <div class="preview-label" id="eyes-prefs-preview-label"></div>
+            <div class="preview-strip" id="eyes-prefs-preview-strip"></div>
+          </div>
+          <div class="prefs-grid">
+            <div class="field">
+              <label for="eyes-input-seconds">Seconds per gaze</label>
+              <input id="eyes-input-seconds" type="number" min="5" max="120" step="5" value="45">
+            </div>
+            <div class="field">
+              <label for="eyes-input-rest">Time between gazes (sec)</label>
+              <input id="eyes-input-rest" type="number" min="0" max="60" step="1" value="3">
+            </div>
+            <div class="field">
+              <label for="eyes-input-rounds">Rounds of sequence</label>
+              <input id="eyes-input-rounds" type="number" min="1" max="10" step="1" value="2">
+            </div>
+            <div class="field">
+              <label>Sound</label>
+              <button id="eyes-audio-toggle" class="pill-toggle" data-on="1">
+                <span class="pill-knob"></span>
+                <span class="pill-label">On</span>
+              </button>
+            </div>
+          </div>
+          <button id="eyes-btn-start-routine" class="btn primary-btn full-width">Start Sequence</button>
+        </section>
+
+        <section id="eyes-screen-player" class="screen">
+          <button class="back-btn" data-back="eyes-screen-prefs">← Back</button>
+          <h1 id="eyes-player-title" class="screen-title">Sequence</h1>
+          <p id="eyes-player-tagline" class="screen-tagline">Soft gaze. Keep head still. Move eyes only.</p>
+          <div class="routine-preview-card">
+            <div class="preview-label" id="eyes-player-preview-label"></div>
+            <div class="preview-strip" id="eyes-player-preview-strip"></div>
+          </div>
+          <div class="current-movement-card">
+            <div id="eyes-current-movement-label" class="movement-label">Gaze Direction</div>
+            <div class="movement-image-frame">
+              <img id="eyes-current-movement-image" alt="Current gaze direction">
+            </div>
+            <div class="movement-meta">
+              <div id="eyes-movement-count" class="movement-count">Gaze 1 of 1</div>
+              <div id="eyes-round-count" class="round-count">Round 1 of 1</div>
+              <div id="eyes-phase-label" class="phase-label">Ready</div>
+            </div>
+          </div>
+          <div class="progress-area">
+            <div class="progress-wrap">
+              <div id="eyes-prog" class="progress-fill"></div>
+            </div>
+          </div>
+          <div class="player-controls">
+            <button id="eyes-btn-play-pause" class="btn primary-btn">Start</button>
+            <button id="eyes-btn-restart" class="btn ghost-btn">Restart Sequence</button>
+          </div>
+          <div id="eyes-status-message" class="status-message"></div>
+        </section>
+      </main>
+    </div>
+
+    <!-- VIEW: BREATHWORK -->
+    <div id="view-breathwork" class="spa-view breath-app">
+      <main class="app-main">
+        <section class="screen screen-active">
+          <h1 class="screen-title">Breathwork Toolkit</h1>
+          <p class="screen-tagline">
+            Solar, Lunar, Alternate and Cyclical breath patterns for nervous system regulation.
+          </p>
+
+          <div class="breath-layout">
+            <!-- BRAND PILL BAR – the ONLY navigation between modes -->
+            <div class="breath-branding">
+              <button class="brand-item active" data-pattern="alternate" type="button">
+                <div class="brand-icon">
+                  <img src="assets/breath/alternate.png" alt="Alternate icon">
+                </div>
+                <div class="brand-labels">
+                  <span class="brand-label-main">Alternate</span>
+                  <span class="brand-label-sub">Central channel</span>
+                </div>
+              </button>
+
+              <button class="brand-item" data-pattern="solar" type="button">
+                <div class="brand-icon">
+                  <img src="assets/breath/solar.png" alt="Solar icon">
+                </div>
+                <div class="brand-labels">
+                  <span class="brand-label-main">Solar</span>
+                  <span class="brand-label-sub">Right nostril</span>
+                </div>
+              </button>
+
+              <button class="brand-item" data-pattern="lunar" type="button">
+                <div class="brand-icon">
+                  <img src="assets/breath/lunar.png" alt="Lunar icon">
+                </div>
+                <div class="brand-labels">
+                  <span class="brand-label-main">Lunar</span>
+                  <span class="brand-label-sub">Left nostril</span>
+                </div>
+              </button>
+
+              <button class="brand-item" data-pattern="cyclical" type="button">
+                <div class="brand-icon">
+                  <img src="assets/breath/cyclical.png" alt="Cyclical icon">
+                </div>
+                <div class="brand-labels">
+                  <span class="brand-label-main">Cyclical</span>
+                  <span class="brand-label-sub">Hyperventilation</span>
+                </div>
+              </button>
+            </div>
+
+            <!-- NOSTRIL MODULE (Solar / Lunar / Alternate) -->
+            <section id="breath-nostrilScreen" class="breath-screen active">
+              <header class="breath-section-header">
+                <h2 class="breath-section-title">Nostril Pattern</h2>
+                <p class="breath-section-subtitle">
+                  Each phase is a timed IN or OUT through a specific nostril.
+                </p>
+              </header>
+
+              <div class="nostril-controls-row">
+                <div class="field">
+                  <label for="breath-phaseDuration">Seconds per phase</label>
+                  <input id="breath-phaseDuration" type="number" min="1" max="20" step="0.5" value="4">
+                  <div class="field-hint">Each IN or OUT phase length.</div>
+                </div>
+                <div class="nostril-buttons">
+                  <button id="breath-startAltBtn" class="btn primary-btn" type="button">Start</button>
+                  <button id="breath-stopAltBtn" class="btn ghost-btn" type="button">Stop / Reset</button>
+                </div>
+              </div>
+
+              <!-- Nostril visualization -->
+              <div class="nostril-visual-card">
+                <div class="nostril-row">
+                  <div class="nostril-col" id="breath-leftNostril">
+                    <div class="nostril-label">Left Nostril</div>
+                    <div class="nostril-dot"></div>
+                  </div>
+                  <div class="nostril-center">⇄</div>
+                  <div class="nostril-col" id="breath-rightNostril">
+                    <div class="nostril-label">Right Nostril</div>
+                    <div class="nostril-dot"></div>
+                  </div>
+                </div>
+
+                <div class="phase-copy">
+                  <div id="breath-phaseTitle" class="phase-title">Ready</div>
+                  <div id="breath-phaseSubtitle" class="phase-subtitle">
+                    Set your phase time, choose a pattern from the icons above, then press <strong>Start</strong>.
+                  </div>
+                </div>
+
+                <div class="progress-area">
+                  <div class="progress-wrap">
+                    <div id="breath-altProgressBar" class="progress-fill"></div>
+                  </div>
+                  <div class="progress-meta">
+                    <span>Phase elapsed: <span id="breath-elapsedTime">0.0s</span></span>
+                    <span>Phase length: <span id="breath-totalTime">4.0s</span></span>
+                  </div>
+                  <div class="cycle-meta">
+                    <span>Cycles: <span id="breath-cycleCount">0</span></span>
+                    <span id="breath-cycleDefinitionText">(Alternate mode: 1 cycle = IN L → OUT R → IN R → OUT
+                      L)</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Info cards – only one visible at a time -->
+              <article id="breath-nostrilInfoAlternate" class="info-card active">
+                <h3>Alternate Nostril · Central Channel Reset</h3>
+                <p>
+                  Alternate nostril breathing balances the left and right sides of the nervous system.
+                  You’re moving attention and airflow between hemispheres in a deliberate loop, which
+                  tends to smooth out extremes: too wired, too flat, too scattered.
+                </p>
+                <p>
+                  One cycle here is: <strong>IN Left → OUT Right → IN Right → OUT Left</strong>.
+                  It’s a full figure-8 between both nostrils.
+                </p>
+                <p>
+                  Use this when you want clear, steady focus and a sense of being “centered” rather
+                  than hyped up or sleepy.
+                </p>
+              </article>
+
+              <article id="breath-nostrilInfoRight" class="info-card">
+                <h3>Solar · Right Nostril Activation</h3>
+                <p>
+                  Right nostril breathing is traditionally linked to the solar, energizing side of the
+                  system. It is associated with alertness, drive, and a mild sympathetic tilt.
+                </p>
+                <p>
+                  One cycle is <strong>IN Right → OUT Right</strong>. We’re keeping attention and flow
+                  on a single side to gently turn the dial up.
+                </p>
+                <p>
+                  Use this when you want to wake up, focus before work, or prime yourself for action.
+                  Avoid close to sleep.
+                </p>
+              </article>
+
+              <article id="breath-nostrilInfoLeft" class="info-card">
+                <h3>Lunar · Left Nostril Calm</h3>
+                <p>
+                  Left nostril work is paired with the lunar, cooling side of the system — slower,
+                  grounded, more parasympathetic.
+                </p>
+                <p>
+                  One cycle is <strong>IN Left → OUT Left</strong>. You’re gently biasing the system
+                  toward rest and digestion without collapsing your alertness.
+                </p>
+                <p>
+                  Use this later in the day, after stress, or as part of a wind-down routine before
+                  sleep.
+                </p>
+              </article>
+            </section>
+
+            <!-- CYCLICAL HYPERVENTILATION MODULE -->
+            <section id="breath-hyperScreen" class="breath-screen">
+              <header class="breath-section-header">
+                <h2 class="breath-section-title">Cyclical Hyperventilation</h2>
+                <p class="breath-section-subtitle">
+                  Fast in/out breathing, followed by empty-hold retention, inhale hold, and release.
+                </p>
+              </header>
+
+              <div class="hv-config">
+                <div class="field">
+                  <label for="breath-hvSpeed">Breath speed</label>
+                  <select id="breath-hvSpeed">
+                    <option value="slow">Slow — 2.2s in / 2.2s out</option>
+                    <option value="standard" selected>Standard — 1.2s in / 1.2s out</option>
+                    <option value="fast">Fast — 0.7s in / 0.7s out</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="breath-hvRounds">Rounds</label>
+                  <input id="breath-hvRounds" type="number" min="2" max="12" value="3">
+                  <div class="field-hint">Full cycles of breath + holds.</div>
+                </div>
+              </div>
+
+              <div class="hv-config">
+                <div class="field">
+                  <label for="breath-hvBreathsSelect">Breaths per round</label>
+                  <select id="breath-hvBreathsSelect">
+                    <option value="10">10 breaths</option>
+                    <option value="15">15 breaths</option>
+                    <option value="20" selected>20 breaths</option>
+                    <option value="25">25 breaths</option>
+                    <option value="30">30 breaths</option>
+                    <option value="35">35 breaths</option>
+                    <option value="custom">Custom…</option>
+                  </select>
+                  <input id="breath-hvBreathsCustom" type="number" min="1" max="200" value="20" class="hidden-input">
+                </div>
+                <div class="nostril-buttons">
+                  <button id="breath-startHvBtn" class="btn primary-btn" type="button">Start Rounds</button>
+                  <button id="breath-stopHvBtn" class="btn ghost-btn" type="button">Stop / Reset</button>
+                </div>
+              </div>
+
+              <div class="nostril-visual-card">
+                <div class="phase-copy">
+                  <div id="breath-hvPhaseTitle" class="phase-title">Ready</div>
+                  <div id="breath-hvPhaseSubtitle" class="phase-subtitle">
+                    Choose speed, rounds, and breaths per round, then press <strong>Start Rounds</strong>.
+                  </div>
+                </div>
+
+                <div class="progress-area">
+                  <div class="progress-wrap">
+                    <div id="breath-hvProgressBar" class="progress-fill"></div>
+                  </div>
+                  <div class="hv-stats">
+                    <span id="breath-hvRoundLabel">Round: —</span>
+                    <span id="breath-hvBreathLabel">Breath: —</span>
+                    <span id="breath-hvDirectionLabel">Phase: —</span>
+                  </div>
+                </div>
+
+                <div class="hv-timer-row">
+                  <div class="hv-timer-main">
+                    <div id="breath-hvTimerDisplay" class="hv-timer-display">0.0</div>
+                    <div id="breath-hvTimerLabel" class="hv-timer-label">Timer</div>
+                  </div>
+                  <button id="breath-hvEndRetentionBtn" class="btn ghost-btn small-btn" type="button" disabled>
+                    End Retention
+                  </button>
+                </div>
+              </div>
+
+              <section id="breath-hvHoldsContainer" class="info-card hv-holds hidden">
+                <h3>Retention history</h3>
+                <ul id="breath-hvHoldsList"></ul>
+              </section>
+            </section>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- VIEW: MUDRAS -->
+    <div id="view-mudras" class="spa-view">
+      <main class="app-main">
+        <!-- SCREEN 1: Config / generator -->
+        <section id="mudras-screen-config" class="screen screen-active">
+          <h1 class="screen-title">Mudras</h1>
+          <p class="screen-tagline">
+            Hand seals for nervous system modulation. Generate a random sequence and follow the timing.
+          </p>
+
+          <div class="routine-card">
+            <h2 class="mini-heading">Mudras & Neural Circuitry</h2>
+            <p class="body-text">
+              Each mudra is a specific arrangement of fingers, joints and contact points that changes
+              sensory input from the hands, alters proprioception and subtly shifts autonomic tone.
+              Treat this as exploration, not diagnosis: notice how each seal changes breath, vision,
+              posture and the felt sense of “signal vs. noise” in your body.
+            </p>
+          </div>
+
+          <div class="prefs-grid" style="margin-top: 14px;">
+            <div class="field">
+              <label for="mudras-input-mudra-count">Number of mudras this session</label>
+              <input id="mudras-input-mudra-count" type="number" min="1" max="45" step="1" value="3">
+            </div>
+
+            <div class="field">
+              <label for="mudras-input-seconds">Seconds per mudra</label>
+              <input id="mudras-input-seconds" type="number" min="5" max="300" step="5" value="45">
+            </div>
+
+            <div class="field">
+              <label for="mudras-input-rest">Time between mudras (sec)</label>
+              <input id="mudras-input-rest" type="number" min="0" max="120" step="1" value="3">
+            </div>
+
+            <div class="field">
+              <label>Sound</label>
+              <button id="mudras-audio-toggle" class="pill-toggle" data-on="1">
+                <span class="pill-knob"></span>
+                <span class="pill-label">On</span>
+              </button>
+            </div>
+          </div>
+
+          <button id="mudras-btn-generate-sequence" class="btn primary-btn full-width" style="margin-top: 14px;">
+            Generate Random Sequence
+          </button>
+          <button id="mudras-btn-single-mudra" class="btn ghost-btn full-width">
+            One Mudra Now
+          </button>
+        </section>
+
+        <!-- SCREEN 2: Player -->
+        <section id="mudras-screen-player" class="screen">
+          <button id="mudras-btn-back-to-config" class="back-btn">← Back</button>
+          <h1 id="mudras-player-title" class="screen-title">Mudra Session</h1>
+          <p class="screen-tagline">
+            Hold each seal gently, keep breathing, and track how your internal signal shifts.
+          </p>
+
+          <div class="routine-preview-card">
+            <div id="mudras-player-preview-label" class="preview-label">Sequence</div>
+            <div id="mudras-player-preview-strip" class="preview-strip">
+              <!-- Thumbs injected by JS -->
+            </div>
+          </div>
+
+          <div class="current-movement-card">
+            <div id="mudras-current-mudra-label" class="movement-label">Mudra</div>
+            <div class="movement-image-frame">
+              <img id="mudras-current-mudra-image" alt="Current mudra">
+            </div>
+            <div class="movement-meta">
+              <div id="mudras-mudra-count" class="movement-count">Mudra 1 of 1</div>
+              <div id="mudras-phase-label" class="phase-label">Ready</div>
+            </div>
+          </div>
+
+          <div class="progress-area">
+            <div class="progress-wrap">
+              <div id="mudras-prog" class="progress-fill"></div>
+            </div>
+          </div>
+
+          <div class="player-controls">
+            <button id="mudras-btn-play-pause" class="btn primary-btn">Start</button>
+            <button id="mudras-btn-restart" class="btn ghost-btn">Restart Sequence</button>
+          </div>
+
+          <div id="mudras-status-message" class="status-message"></div>
+        </section>
+      </main>
+    </div>
+
+    <!-- VIEW: RANDOM -->
+    <div id="view-random" class="spa-view">
+      <main class="app-main">
+        <section class="screen screen-active">
+          <h1 class="screen-title">🔀 Random Routine</h1>
+          <p class="screen-tagline">Let fate choose your practice - every routine is an adventure</p>
+
+          <div class="random-grid">
+            <button class="random-card" data-type="all">
+              <span class="random-icon">🌟</span>
+              <span class="random-label">Random of ALL</span>
+            </button>
+
+            <button class="random-card" data-type="eyes">
+              <span class="random-icon">👁️</span>
+              <span class="random-label">Random Eye Routine</span>
+            </button>
+
+            <button class="random-card" data-type="breath">
+              <span class="random-icon">🫁</span>
+              <span class="random-label">Random Breath Pattern</span>
+            </button>
+
+            <button class="random-card" data-type="lower">
+              <span class="random-icon">🦵</span>
+              <span class="random-label">Random Lower Body</span>
+            </button>
+
+            <button class="random-card" data-type="upper">
+              <span class="random-icon">💪</span>
+              <span class="random-label">Random Upper Body</span>
+            </button>
+
+            <button class="random-card" data-type="head">
+              <span class="random-icon">🧠</span>
+              <span class="random-label">Random Head</span>
+            </button>
+
+            <button class="random-card" data-type="mudra">
+              <span class="random-icon">🤲</span>
+              <span class="random-label">Random Mudra</span>
+            </button>
+          </div>
+
+          <div class="back-link">
+            <button class="btn ghost-btn" onclick="window.history.back()">← Back</button>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- VIEW: OTHER (About/FAQ) -->
+    <div id="view-other" class="spa-view">
+      <main class="app-main">
+        <section class="screen screen-active">
+          <h1 class="screen-title">About / FAQ / Contact</h1>
+          <div style="padding: 0 16px; max-width: 600px; margin: 0 auto;">
+            <!-- CONTACT -->
+            <section style="margin-top:14px;">
+              <h2
+                style="font-size:0.95rem; letter-spacing:0.16em; text-transform:uppercase; color:var(--gold); margin:0 0 6px; text-align:left;">
+                Contact
+              </h2>
+              <p class="body-text" style="font-size:0.82rem; line-height:1.5;">
+                Have feedback, questions, or want to collaborate?
+              </p>
+              <p style="font-size:0.82rem; line-height:1.5;">
+                📩 <strong>Email:</strong>
+                <a href="mailto:TreeOfLifeNRI@yahoo.com" style="color:var(--cream); text-decoration:underline;">
+                  TreeOfLifeNRI@yahoo.com
+                </a>
+              </p>
+              <p style="font-size:0.8rem; line-height:1.5;">
+                Presented By: Brian O'Kelly<br>
+                Tree of Life: Neurological Research Institute<br>
+                📱 (817) 487-6050
+              </p>
+            </section>
+
+            <!-- ABOUT -->
+            <section style="margin-top:18px;">
+              <h2
+                style="font-size:0.95rem; letter-spacing:0.16em; text-transform:uppercase; color:var(--gold); margin:0 0 6px; text-align:left;">
+                About
+              </h2>
+              <p style="font-size:0.82rem; line-height:1.6; margin-bottom:10px;">
+                Tree of Life NRI is a practical innervation atlas for real humans, not lab charts.
+                Everything here is built from one simple idea: when you breathe deeper, move smarter,
+                and wake up your nerves on purpose, your whole system works better.
+              </p>
+              <ul style="font-size:0.8rem; line-height:1.5; padding-left:20px; margin-top:4px; margin-bottom:10px;">
+                <li>Breathwork tools for nervous system regulation</li>
+                <li>Neuro-ocular activation for eyes, focus, and balance</li>
+                <li>Innervation routines for lower body, upper body, and head/neck</li>
+              </ul>
+            </section>
+
+            <!-- FAQ -->
+            <section style="margin-top:18px; margin-bottom:20px;">
+              <h2
+                style="font-size:0.95rem; letter-spacing:0.16em; text-transform:uppercase; color:var(--gold); margin:0 0 6px; text-align:left;">
+                FAQ
+              </h2>
+              <div style="font-size:0.8rem; line-height:1.6; display:flex; flex-direction:column; gap:10px;">
+                <div>
+                  <strong>1. What is this site?</strong><br>
+                  A guided toolkit of breathwork and innervation exercises.
+                </div>
+                <div>
+                  <strong>2. Is this medical advice?</strong><br>
+                  No. Educational and experiential only.
+                </div>
+                <div>
+                  <strong>3. How often should I practice?</strong><br>
+                  Daily short sessions (5-15 min) work best.
+                </div>
+              </div>
+            </section>
+          </div>
+        </section>
+      </main>
+    </div>
+
   </div>
 
-  <script>
-    function scrollToTop() {
-      const screen = document.querySelector('.screen-active');
-      if (screen) {
-        screen.scrollTo({ top: 0, behavior: 'smooth' });
-      } else {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
-    }
+  <footer class="app-footer">
+    <nav class="footer-nav">
+      <a href="#random">🔀 Random</a>
+      <a href="#" id="footer-stats">📊 Stats</a>
+      <a href="#home">☰ Home</a>
+    </nav>
+  </footer>
+  </div>
 
-    document.addEventListener('DOMContentLoaded', () => {
-      // Initialize lazy image loader
-      const lazyLoader = new LazyImageLoader({ rootMargin: '100px' });
+  <audio id="audio-ding" src="assets/audio/ding.mp3" preload="auto"></audio>
+  <audio id="audio-beep" preload="auto"></audio>
 
-      // Observe all images with data-src attribute
-      document.querySelectorAll('img[data-src]').forEach(img => {
-        lazyLoader.observe(img);
-      });
-
-      // Make entire card clickable (except when clicking inside an inner link).
-      document.querySelectorAll('.routine-card[data-href]').forEach(card => {
-        card.addEventListener('click', (e) => {
-          if (e.target.closest('a')) return; // let icon links work normally
-          const href = card.getAttribute('data-href');
-          if (href) {
-            window.location.href = href;
-          }
-        });
-      });
-
-      function shuffleAndTake(list, maxCount) {
-        const copy = [...list];
-        for (let i = copy.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [copy[i], copy[j]] = [copy[j], copy[i]];
-        }
-        return copy.slice(0, Math.min(maxCount, copy.length));
-      }
-
-      // 1) MUDRAS: show 4 random mudra icons on the Mudras card
-      const mudraStrip = document.querySelector('.mudras-strip');
-      if (mudraStrip) {
-        const TOTAL_MUDRAS = 45; // adjust if you have fewer
-        const chosen = [];
-        while (chosen.length < 4 && chosen.length < TOTAL_MUDRAS) {
-          const n = Math.floor(Math.random() * TOTAL_MUDRAS) + 1;
-          if (!chosen.includes(n)) chosen.push(n);
-        }
-        mudraStrip.innerHTML = '';
-        chosen.forEach(i => {
-          const d = document.createElement('div');
-          d.className = 'thumb';
-          const img = document.createElement('img');
-          img.dataset.src = 'assets/mudras/' + i + '.svg';
-          img.alt = 'Mudra ' + i;
-          lazyLoader.observe(img);
-          d.appendChild(img);
-          mudraStrip.appendChild(d);
-        });
-      }
-
-      // 2) BREATHWORK: show 4 random breathwork icons
-      const breathworkStrip = document.querySelector('.breathwork-strip');
-      if (breathworkStrip) {
-        const BREATHWORK_ICONS = [
-          { file: 'sword.svg', title: 'Breath of Fire' },
-          { file: 'wings.svg', title: 'Angelic Breath' },
-          { file: 'caduceus.svg', title: 'Caduceus Breath' },
-          { file: 'lungs.svg', title: 'Deep Lung Breath' }
-        ];
-
-        breathworkStrip.innerHTML = '';
-        BREATHWORK_ICONS.forEach(icon => {
-          const a = document.createElement('a');
-          a.href = 'breathwork.html';
-          a.className = 'thumb';
-          a.title = icon.title;
-          const img = document.createElement('img');
-          img.dataset.src = `assets/breathwork/${icon.file}`;
-          img.alt = icon.title;
-          a.appendChild(img);
-          breathworkStrip.appendChild(a);
-          if (lazyLoader) lazyLoader.observe(img);
-        });
-      }
-
-      // 3) LOWER BODY: show 4 lower body icons
-      const lowerStrip = document.querySelector('.lower-icons');
-      if (lowerStrip) {
-        const lowerRoutines = [
-          { key: 'FEET', file: '1_FEET_MIDCROSSRIGHT_D_IMG.svg', alt: 'Feet' },
-          { key: 'GROUNDING', file: '1_GROUNDING_FORWARD_D_IMG.svg', alt: 'Grounding' },
-          { key: 'HIPS1', file: '1_HIPS1_LEFTFRONTIN_D_IMG.svg', alt: 'Hips I' },
-          { key: 'HIPS2', file: '1_HIPS2_PLANKOPPOSITELEFTFRONT_D_IMG.svg', alt: 'Hips II' }
-        ];
-        lowerStrip.innerHTML = '';
-        lowerRoutines.forEach(r => {
-          const a = document.createElement('a');
-          a.href = 'lower.html?routine=' + r.key;
-          a.className = 'icon-thumb lower-thumb';
-          const img = document.createElement('img');
-          img.dataset.src = 'InnervationSVGs/' + r.file;
-          img.alt = r.alt;
-          lazyLoader.observe(img);
-          a.appendChild(img);
-          lowerStrip.appendChild(a);
-        });
-      }
-
-      // 3) UPPER BODY: random 6 routines using the first movement SVG from each
-      const upperStrip = document.querySelector('.upper-icons');
-      if (upperStrip) {
-        const UPPER_ROUTINES = [
-          { key: 'PALMSTOGETHER', label: 'Palms Together', file: '2_CLASPMID_LEFT_D_IMG.svg' },
-          { key: 'PALMIN', label: 'Palm In', file: '2_PALMIN_UP_D_IMG.svg' },
-          { key: 'PALMOPEN', label: 'Palm Open', file: '2_PALMOPEN_UP_D_IMG.svg' },
-          { key: 'PALMOUT', label: 'Palm Out', file: '2_PALMOUT_DOWN_D_IMG.svg' },
-          { key: 'PALMCLOSED', label: 'Palm Closed', file: '2_PALMCLOSED_UP_D_IMG.svg' },
-          { key: 'HEARTOPEN', label: 'Heart Open', file: '2_HEARTOPEN_RIGHT_D_IMG.svg' },
-          { key: 'HEARTPROTECTED', label: 'Heart Protected', file: '2_HEARTPROTECTED_RIGHT_D_IMG.svg' },
-          { key: 'SCAPULA', label: 'Scapula', file: '2_SCAPULA_RIGHT_D_IMG.svg' },
-          { key: 'CROSSOPENBACKWARD', label: 'Cross Back', file: '2_CROSSPALM_BACKWARD_0_IMG.svg' },
-          { key: 'CROSSOPENDOWN', label: 'Cross Down', file: '2_CROSSPALM_DOWN_0_IMG.svg' },
-          { key: 'CROSSOPENFORWARD', label: 'Cross Forward', file: '2_CROSSPALM_FORWARD_0_IMG.svg' },
-          { key: 'CROSSOPENREVERSE', label: 'Cross Reverse', file: '2_CROSSPALM_REVERSE_0_IMG.svg' },
-          { key: 'CROSSOPENUP', label: 'Cross Up', file: '2_CROSSPALM_UP_0_IMG.svg' },
-          { key: 'CROSSCLOSEDBACKWARD', label: 'Fists Back', file: '2_CROSSFIST_BACKWARD_0_IMG.svg' },
-          { key: 'CROSSCLOSEDDOWN', label: 'Fists Down', file: '2_CROSSFIST_DOWN_0_IMG.svg' },
-          { key: 'CROSSCLOSEDFORWARD', label: 'Fists Forward', file: '2_CROSSFIST_FORWARD_0_IMG.svg' },
-          { key: 'CROSSCLOSEDREVERSE', label: 'Fists Reverse', file: '2_CROSSFIST_REVERSE_0_IMG.svg' },
-          { key: 'CROSSCLOSEDUP', label: 'Fists Up', file: '2_CROSSFIST_UP_0_IMG.svg' }
-        ];
-
-        upperStrip.innerHTML = '';
-        shuffleAndTake(UPPER_ROUTINES, 4).forEach(r => {
-          const a = document.createElement('a');
-          a.href = 'upper.html?routine=' + r.key;
-          a.className = 'icon-thumb';
-          const img = document.createElement('img');
-          img.dataset.src = 'InnervationSVGs/' + r.file;
-          img.alt = r.label;
-          lazyLoader.observe(img);
-          a.appendChild(img);
-          upperStrip.appendChild(a);
-        });
-      }
-
-      // 4) HEAD: random 6 routines using the first movement SVG from each
-      const headStrip = document.querySelector('.head-icons');
-      if (headStrip) {
-        const HEAD_ROUTINES = [
-          { key: 'CHINBOTTOM', label: 'Chin Bottom', file: '3_CHINBOTTOM_0_D_IMG.svg' },
-          { key: 'CHINTOP', label: 'Chin Top', file: '3_CHINTOP_0_D_IMG.svg' },
-          { key: 'LION', label: 'Lion', file: '3_LION_0_D_IMG.svg' },
-          { key: 'LIONLEFT', label: 'Lion Left', file: '3_LIONLEFT_0_D_IMG.svg' },
-          { key: 'LIONRIGHT', label: 'Lion Right', file: '3_LIONRIGHT_0_D_IMG.svg' },
-          { key: 'NOSE', label: 'Nose', file: '3_OPENNOSE_OPENMOUTH_D_IMG.svg' },
-          { key: 'PULL', label: 'Pulls', file: '3_PULLTOP_R_D_IMG.svg' }
-        ];
-
-        headStrip.innerHTML = '';
-        shuffleAndTake(HEAD_ROUTINES, 4).forEach(r => {
-          const a = document.createElement('a');
-          a.href = 'head.html?routine=' + r.key;
-          a.className = 'icon-thumb';
-          const img = document.createElement('img');
-          img.dataset.src = 'InnervationSVGs/' + r.file;
-          img.alt = r.label;
-          lazyLoader.observe(img);
-          a.appendChild(img);
-          headStrip.appendChild(a);
-        });
-      }
-    });
-  </script>
-
-  <!-- Time Tracking Scripts -->
+  <!-- Scripts -->
+  <script src="js/router.js"></script>
   <script type="module" src="js/firebase-manager.js"></script>
   <script src="js/time-tracker.js"></script>
   <script src="js/time-stats-ui.js"></script>
   <script src="js/lazy-loader.js"></script>
+  <script src="js/menu.js"></script>
+  <script src="js/completion-prompt.js"></script>
 
-  <!-- Homepage Stats Script -->
+  <!-- SPA Scripts (Renamed/Modified app scripts will be needed) -->
+  <!-- We will modify these scripts to attach to specific IDs -->
+  <script src="js/legs_app.js" defer></script>
+  <script src="js/upper_app.js" defer></script>
+  <script src="js/head_app.js" defer></script>
+  <script src="js/eyes_app.js" defer></script>
+  <script src="js/mudras_app.js" defer></script>
+  <script src="js/breathwork.js" defer></script>
+
+  <!-- Register Service Worker -->
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      // Update stats summary
-      function updateHomeStats() {
-        if (!window.timeTracker) return;
-
-        const stats = window.timeTracker.getSummaryStats();
-
-        // Week time
-        const weekEl = document.querySelector('#home-week-time .home-stat-value');
-        if (weekEl) {
-          weekEl.textContent = stats.week > 0 ? TimeTracker.formatTime(stats.week) : '0m';
-        }
-
-        // Day streak (count consecutive days with practice)
-        const streakEl = document.querySelector('#home-day-streak .home-stat-value');
-        if (streakEl) {
-          const streak = calculateDayStreak();
-          streakEl.textContent = streak;
-        }
-      }
-
-      // Calculate day streak
-      function calculateDayStreak() {
-        if (!window.timeTracker || !window.timeTracker.data.sessions.length) return '0';
-
-        const sessions = window.timeTracker.data.sessions;
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        const daysSeen = new Set();
-        sessions.forEach(s => {
-          const d = new Date(s.timestamp);
-          d.setHours(0, 0, 0, 0);
-          daysSeen.add(d.getTime());
-        });
-
-        const sortedDays = Array.from(daysSeen).sort((a, b) => b - a);
-        let streak = 0;
-        let checkDate = today.getTime();
-
-        for (const day of sortedDays) {
-          if (day === checkDate) {
-            streak++;
-            checkDate -= 24 * 60 * 60 * 1000;
-          } else if (day < checkDate) {
-            break;
-          }
-        }
-
-        return streak.toString();
-      }
-
-      // Stats button handlers (home card + header)
-      const homeStatsBtn = document.getElementById('home-stats-btn');
-      if (homeStatsBtn && window.timeStatsUI) {
-        homeStatsBtn.addEventListener('click', (e) => {
-          e.preventDefault();
-          window.timeStatsUI.open();
-        });
-      }
-
-      // Random routine button handler
-      const randomBtn = document.getElementById('home-random-btn');
-      if (randomBtn) {
-        randomBtn.addEventListener('click', () => {
-          const allRoutines = [
-            { url: 'eyes.html?routine=FULL' },
-            { url: 'eyes.html?routine=GROUND' },
-            { url: 'eyes.html?routine=RESTORE' },
-            { url: 'lower.html?routine=HIPS1' },
-            { url: 'lower.html?routine=HIPS2' },
-            { url: 'upper.html?routine=RANDOM' },
-            { url: 'head.html?routine=RANDOM' },
-            { url: 'mudras.html' },
-            { url: 'breathwork.html' }
-          ];
-          const random = allRoutines[Math.floor(Math.random() * allRoutines.length)];
-          window.location.href = random.url;
-        });
-      }
-
-      // Initial update
-      updateHomeStats();
-
-      // Listen for remote data sync
-      window.addEventListener('time-tracker-update', () => {
-        updateHomeStats();
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js', { scope: '/ToLNRIupdates/' })
+          .then(reg => console.log('Service Worker registered!', reg))
+          .catch(err => console.log('Service Worker registration failed: ', err));
       });
+    }
+
+    // Quick Fix for Home Stats
+    function updateHomeStats() {
+      if (window.timeTracker) {
+        const secs = window.timeTracker.getTimeThisWeek();
+        const el = document.getElementById('home-weekly-time');
+        const block = document.getElementById('home-stats-block');
+        if (el && block) {
+          el.textContent = window.TimeTracker.formatTime(secs);
+          block.style.display = 'block';
+        }
+      }
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(updateHomeStats, 500);
     });
   </script>
-  <script src="js/time-tracker.js"></script>
-  <script src="js/time-stats-ui.js"></script>
-  <script src="js/menu.js"></script>
 </body>
 
 </html>
