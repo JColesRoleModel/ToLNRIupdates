@@ -1,0 +1,22 @@
+{
+  "short_name": "Innervation",
+  "name": "Innervation Atlas - Tree of Life",
+  "icons": [
+    {
+      "src": "assets/pwa/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/pwa/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/ToLNRIupdates/index.html",
+  "display": "standalone",
+  "background_color": "#0F0F0F",
+  "theme_color": "#0F0F0F",
+  "description": "Innervation Atlas PWA - Neurological Research Institute"
+}
