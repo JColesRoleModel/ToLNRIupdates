@@ -66,11 +66,6 @@ class TimeTracker {
         });
 
         this.saveData();
-
-        // Sync to Firebase if available
-        if (window.firebaseManager) {
-            window.firebaseManager.saveSession(this.data.sessions[this.data.sessions.length - 1]);
-        }
     }
 
     // Stop tracking session
@@ -174,7 +169,6 @@ class TimeTracker {
 
     // Format seconds into human-readable time
     static formatTime(seconds) {
-        seconds = Math.round(seconds);
         if (seconds < 60) {
             return `${seconds}s`;
         }

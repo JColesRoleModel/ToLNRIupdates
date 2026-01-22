@@ -140,11 +140,6 @@ class TimeStatsUI {
         this.close();
       }
     });
-
-    // Listen for remote updates while open
-    window.addEventListener('time-tracker-update', () => {
-      if (this.isOpen) this.updateStats();
-    });
   }
 
   // Update stats display
