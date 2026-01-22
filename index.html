@@ -21,18 +21,25 @@
   <div class="app-frame">
     <header class="brand-header">
       <div class="brand-mark home-brand">
-        <div class="brand-presenter-block">
-          <div class="presented-label">presented by:</div>
-          <div class="presented-name">Brian O'Kelly</div>
+        <!-- LEFT: Brand Text -->
+        <div class="brand-text">
+          <div class="brand-title">TREE OF LIFE</div>
+          <div class="brand-subtitle">Neurological Research Institute</div>
         </div>
 
+        <!-- CENTER: Logo -->
         <a href="index.html" class="brand-logo-link">
           <img src="assets/logo/tolnrilogo.png" alt="Tree of Life logo" class="brand-logo-image">
         </a>
 
-        <div class="brand-text">
-          <div class="brand-title">TREE OF LIFE</div>
-          <div class="brand-subtitle">Neurological Research Institute</div>
+        <!-- RIGHT: Login Button -->
+        <div class="header-right">
+          <button id="login-btn" class="btn ghost-btn login-btn">
+            <span>Login</span>
+          </button>
+          <div id="user-profile" class="user-profile hidden">
+            <img id="user-avatar" src="" alt="User" class="user-avatar">
+          </div>
         </div>
       </div>
     </header>
@@ -372,6 +379,7 @@
   </script>
 
   <!-- Time Tracking Scripts -->
+  <script type="module" src="js/firebase-manager.js"></script>
   <script src="js/time-tracker.js"></script>
   <script src="js/time-stats-ui.js"></script>
   <script src="js/lazy-loader.js"></script>
