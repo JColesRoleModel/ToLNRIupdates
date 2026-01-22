@@ -33,10 +33,15 @@ class TimeTracker {
         return { sessions: [] };
     }
 
-    // Save data to localStorage
+    // Save data to localStorage (and Firebase if available)
     saveData() {
         try {
             localStorage.setItem(this.storageKey, JSON.stringify(this.data));
+
+            // Sync to Firebase if module is loaded and user is logged in
+            if (window.ToLFirebase && window.ToLFirebase.saveData) {
+                window.ToLFirebase.saveData(this.data);
+            }
         } catch (e) {
             console.error('Error saving time tracking data:', e);
         }
@@ -61,7 +66,8 @@ class TimeTracker {
             section: this.currentSection,
             routine: this.currentRoutine,
             movement: movementLabel,
-            duration: durationSeconds, // Use the configured duration, not wall clock!
+            movement: movementLabel,
+            duration: Math.round(durationSeconds), // Round to nearest second as requested
             timestamp: Date.now()
         });
 
@@ -221,6 +227,12 @@ class TimeTracker {
             byMovement: this.getTimeByMovement(),
             totalSessions: this.data.sessions.length
         };
+    }
+
+    // Trigger UI updates across the app
+    refreshStatsUI() {
+        // Dispatch a custom event that UI components can listen to
+        window.dispatchEvent(new Event('time-tracker-data-changed'));
     }
 }
 

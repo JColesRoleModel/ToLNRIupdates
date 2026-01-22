@@ -13,6 +13,14 @@
   <link rel="stylesheet" href="css/completion-modal.css">
   <!-- Favicon for site icon -->
   <link rel="icon" type="image/png" href="assets/logo/tolnrilogo.png">
+<link rel="manifest" href="manifest.json">
+
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ToL NRI">
+  <link rel="apple-touch-icon" href="assets/pwa/icon-180.png">
+  <meta name="theme-color" content="#0F0F0F">
+
 </head>
 
 <body>
@@ -166,6 +174,8 @@
   <!-- Audio cue for end of each movement/phase -->
   <audio id="audio-ding" src="assets/audio/ding.mp3" preload="auto"></audio>
   <script src="js/completion-prompt.js"></script>
+<script type="module" src="js/firebase-integration.js"></script>
+<script src="js/pwa-init.js"></script>
 </body>
 
 </html>

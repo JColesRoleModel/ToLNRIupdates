@@ -140,6 +140,13 @@ class TimeStatsUI {
         this.close();
       }
     });
+
+    // Listen for external data changes (e.g. Firebase sync)
+    window.addEventListener('time-tracker-data-changed', () => {
+      if (this.isOpen) {
+        this.updateStats();
+      }
+    });
   }
 
   // Update stats display
